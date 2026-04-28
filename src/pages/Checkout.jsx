@@ -119,9 +119,6 @@ const Checkout = () => {
         }
     }, [cartReady, isBuyNow, cart.length, isOrdered, navigate]);
 
-    // Hold render until hydration is done
-    if (!cartReady && !isOrdered) return null;
-
     const shippingFee = selectedBranch ? Number(selectedBranch.shipping_fee) : 0;
     
     // Loyalty Points (Coins) Evaluation
@@ -133,6 +130,22 @@ const Checkout = () => {
     const appliedCoinDiscount = (useCoins && coinsUsable > 0) ? coinsUsable : 0;
 
     const grandTotal = checkoutSubtotal + shippingFee - appliedCoinDiscount;
+
+    // Meta Pixel: Track Purchase Success
+    useEffect(() => {
+        if (isOrdered && window.fbq) {
+            window.fbq('track', 'Purchase', {
+                value: grandTotal,
+                currency: 'NPR',
+                content_ids: checkoutItems.map(item => item.id),
+                content_type: 'product',
+                num_items: checkoutItems.length
+            });
+        }
+    }, [isOrdered]);
+
+    // Hold render until hydration is done
+    if (!cartReady && !isOrdered) return null;
 
     const handleSubmit = async (e) => {
         e.preventDefault();
@@ -208,18 +221,6 @@ const Checkout = () => {
         }
     };
 
-    // Meta Pixel: Track Purchase Success
-    useEffect(() => {
-        if (isOrdered && window.fbq) {
-            window.fbq('track', 'Purchase', {
-                value: grandTotal,
-                currency: 'NPR',
-                content_ids: checkoutItems.map(item => item.id),
-                content_type: 'product',
-                num_items: checkoutItems.length
-            });
-        }
-    }, [isOrdered]);
 
     const handleCreateAccount = async () => {
         if (pin.length < 4) return alert('Please enter a 4-digit PIN');
