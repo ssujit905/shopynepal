@@ -10,10 +10,12 @@ import {
     Star, RotateCcw, Camera, Trash2, CheckCircle2, Loader2,
     ArrowLeft, Share2
 } from 'lucide-react';
+import { useNotification } from '../context/NotificationContext';
 
 const MyOrders = () => {
     const { customer, login, logout, register, updateProfile, loading: authLoading, refreshCustomer } = useCustomer();
     const { settings } = useSettings();
+    const { showNotification } = useNotification();
     const location = useLocation();
     const navigate = useNavigate();
     
@@ -145,7 +147,7 @@ const MyOrders = () => {
             } catch (err) { console.error('Share failed:', err); }
         } else {
             navigator.clipboard.writeText(text);
-            alert('Order info copied to clipboard!');
+            showNotification('Order info copied to clipboard!', 'success');
         }
     };
 
@@ -170,7 +172,7 @@ const MyOrders = () => {
                 throw new Error('Verification failed. Please check your order details.');
             }
 
-            alert('PIN reset successfully! You can now login.');
+            showNotification('PIN reset successfully! You can now login.', 'success');
             setShowResetModal(false);
             setPhone(resetPhone);
             setPin(resetNewPin);
@@ -272,7 +274,7 @@ const MyOrders = () => {
             setShowCancelModal(false);
         } catch (err) {
             console.error('Cancel error:', err);
-            alert('Could not cancel order. Please contact support.');
+            showNotification('Could not cancel order. Please contact support.', 'error');
         } finally {
             setIsCancelling(false);
         }
@@ -335,10 +337,10 @@ const MyOrders = () => {
 
             setRatedOrderIds(prev => new Set([...prev, rateData.orderId]));
             setShowRateModal(false);
-            alert("Thanks for your review! 25 Shopy Coins have been added to your pending balance and will be available after the return window closes! ⏳🪙");
+            showNotification("Thanks for your review! 25 Shopy Coins added! ⏳🪙", 'success', 6000);
         } catch (err) {
             console.error('Rating error:', err);
-            alert('Failed to submit rating. Please try again.');
+            showNotification('Failed to submit rating. Please try again.', 'error');
         } finally {
             setIsRating(false);
         }

@@ -62,17 +62,23 @@ const ProductCard = ({ product }) => {
                         zIndex: 2
                     }}>
                         <span style={{
-                            backgroundColor: '#000',
-                            color: 'white',
+                            backgroundColor: 'rgba(255, 255, 255, 0.9)',
+                            color: '#64748b',
                             padding: '6px 14px',
-                            fontWeight: '900',
-                            fontSize: '0.8rem',
-                            borderRadius: '4px',
+                            fontWeight: '800',
+                            fontSize: '0.7rem',
+                            borderRadius: '8px',
                             textTransform: 'uppercase',
-                            letterSpacing: '0.05em',
-                            boxShadow: '0 4px 15px rgba(0,0,0,0.3)',
-                            border: '1px solid rgba(255,255,255,0.2)'
-                        }}>Sold Out</span>
+                            letterSpacing: '0.1em',
+                            boxShadow: '0 4px 12px rgba(0,0,0,0.1)',
+                            border: '1px solid #e2e8f0',
+                            display: 'flex',
+                            alignItems: 'center',
+                            gap: '6px'
+                        }}>
+                            <div style={{ width: '6px', height: '6px', borderRadius: '50%', backgroundColor: '#94a3b8' }} />
+                            Sold Out
+                        </span>
                     </div>
                 )}
             </Link>
