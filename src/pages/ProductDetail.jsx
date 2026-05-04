@@ -273,6 +273,7 @@ const ProductDetail = () => {
             selectedColor,
             selectedSize,
             quantity: quantity,
+            ad_id: product.ad_id, // Capture the ad assigned to this product
             image: combinedMedia.find(m => m.type === 'image')?.image_url || product.image
         };
         
