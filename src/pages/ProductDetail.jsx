@@ -1,4 +1,4 @@
-import { useParams, Link, useNavigate } from 'react-router-dom';
+import { useParams, Link, useNavigate, useLocation } from 'react-router-dom';
 import { useProducts } from '../context/ProductContext';
 import { useSettings } from '../context/SettingsContext';
 import { useCart } from '../context/CartContext';
@@ -9,7 +9,7 @@ import {
     RotateCcw,
     ShieldCheck,
     MessageCircle,
-    Heart,
+    Package,
     MapPin,
     Share2,
     MoreVertical,
@@ -19,15 +19,18 @@ import {
     X,
     Star,
     User,
-    Loader2
+    Loader2,
+    Store
 } from 'lucide-react';
 import { useState, useEffect, useMemo } from 'react';
 import { supabase } from '../lib/supabase';
+import { storeSlug } from '../lib/storeSlug';
 import { useNotification } from '../context/NotificationContext';
 
 const ProductDetail = () => {
     const { id } = useParams();
     const navigate = useNavigate();
+    const location = useLocation();
     const { addToCart, cart } = useCart();
     const { showNotification } = useNotification();
     const [product, setProduct] = useState(null);
@@ -39,9 +42,11 @@ const ProductDetail = () => {
     const [pickerAction, setPickerAction] = useState('buy');
     const [quantity, setQuantity] = useState(1);
     const [touchStart, setTouchStart] = useState(0);
-    const [isFavorite, setIsFavorite] = useState(false);
-    const [activeImageIndex, setActiveImageIndex] = useState(0);
+    const [isFavorite, setIsFavorite] = useState(false);    const [activeImageIndex, setActiveImageIndex] = useState(0);
     const [isFullscreenOpen, setIsFullscreenOpen] = useState(false);
+    const [vendorProfile, setVendorProfile] = useState(null);
+    const [vendorProductCount, setVendorProductCount] = useState(0);
+    const [vendorRating, setVendorRating] = useState(null);
 
     // ── VARIANT LOGIC ──
     const uniqueColors = useMemo(() => 
@@ -57,7 +62,7 @@ const ProductDetail = () => {
     const { settings } = useSettings();
     const flashSaleEndTime = settings.flash_sale_end;
     const isFlashSaleTimeValid = useMemo(() => {
-        if (!flashSaleEndTime) return false;
+        if (!flashSaleEndTime) return true;
         return new Date(flashSaleEndTime.replace(' ', 'T')) > new Date();
     }, [flashSaleEndTime]);
 
@@ -89,6 +94,36 @@ const ProductDetail = () => {
                 
                 if (!p) return;
                 setProduct(p);
+
+                // Fetch vendor store info if product belongs to a vendor
+                if (p.vendor_id) {
+                    const { data: vProfile } = await supabase
+                        .from('vendor_store_profiles')
+                        .select('id, full_name, store_name, avatar_url, is_verified, phone, whatsapp, address, city, description')
+                        .eq('id', p.vendor_id)
+                        .maybeSingle();
+                    if (vProfile) setVendorProfile(vProfile);
+
+                    // Store stats: product count + average rating across the store
+                    const { data: storeProducts } = await supabase
+                        .from('website_products')
+                        .select('id')
+                        .eq('vendor_id', p.vendor_id)
+                        .eq('is_active', true);
+                    const productIds = (storeProducts || []).map(sp => sp.id);
+                    setVendorProductCount(productIds.length);
+                    if (productIds.length > 0) {
+                        const { data: storeRatings } = await supabase
+                            .from('website_product_ratings')
+                            .select('rating')
+                            .in('product_id', productIds);
+                        const all = storeRatings || [];
+                        if (all.length > 0) {
+                            const avg = all.reduce((s, r) => s + Number(r.rating), 0) / all.length;
+                            setVendorRating({ avg, count: all.length });
+                        }
+                    }
+                }
 
                 // 2. Fetch Variants with real-time stock
                 const { data: v } = await supabase.from('website_variant_stock_view').select('*').eq('parent_product_id', id);
@@ -273,6 +308,7 @@ const ProductDetail = () => {
             selectedColor,
             selectedSize,
             quantity: quantity,
+            ad_id: product.ad_id, // Capture the ad assigned to this product
             image: combinedMedia.find(m => m.type === 'image')?.image_url || product.image
         };
         
@@ -572,8 +608,8 @@ const ProductDetail = () => {
                 {/* Right Side: Product Details */}
                 <div className="details-column">
                     {/* Product Variation Thumbnails - Clickable */}
-                    <div style={{ backgroundColor: 'white', padding: '15px', marginTop: '1px' }}>
-                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '10px' }}>
+                    <div style={{ backgroundColor: 'white', padding: '12px 12px 6px', marginTop: '1px' }}>
+                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '6px' }}>
                             <p style={{ fontSize: '0.8rem', color: '#666' }}>{combinedMedia.length} Media Avail.</p>
                             {combinedMedia[activeImageIndex]?.label && (
                                 <span style={{ fontSize: '0.8rem', color: 'var(--primary-red)', fontWeight: '800', textTransform: 'uppercase' }}>
@@ -611,26 +647,27 @@ const ProductDetail = () => {
                     </div>
 
                     {/* Pricing Section */}
-                    <div style={{ backgroundColor: 'white', padding: '1rem', marginTop: '1px' }}>
+                    <div style={{ backgroundColor: 'white', padding: '0.25rem 1rem', marginTop: '1px' }}>
                         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                             <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
                                 <span style={{ fontSize: '1.75rem', color: 'var(--primary-red)', fontWeight: '900' }}>Rs. {activePrice.toLocaleString()}</span>
                                 {product.is_sold_out && (
                                     <span style={{
-                                        backgroundColor: '#f8fafc',
-                                        color: '#64748b',
-                                        padding: '4px 10px',
+                                        background: 'linear-gradient(135deg, #d9363e 0%, var(--primary-red) 100%)',
+                                        color: '#fff',
+                                        padding: '6px 11px',
                                         fontWeight: '800',
                                         fontSize: '0.65rem',
-                                        borderRadius: '6px',
+                                        borderRadius: '999px',
                                         textTransform: 'uppercase',
                                         letterSpacing: '0.1em',
-                                        border: '1px solid #e2e8f0',
+                                        border: '1px solid rgba(255,255,255,0.2)',
                                         display: 'inline-flex',
                                         alignItems: 'center',
-                                        gap: '4px'
+                                        gap: '6px',
+                                        boxShadow: '0 6px 18px rgba(239,68,68,0.24)'
                                     }}>
-                                        <div style={{ width: '6px', height: '6px', borderRadius: '50%', backgroundColor: '#94a3b8' }} />
+                                        <Sparkles size={12} strokeWidth={2.5} color="#d8b36a" />
                                         Sold Out
                                     </span>
                                 )}
@@ -641,26 +678,19 @@ const ProductDetail = () => {
                                 <MapPin size={14} color="#64748b" strokeWidth={2.5} />
                                 <span style={{ fontSize: '0.85rem', color: '#64748b', fontWeight: '700' }}>{product.city || 'Kathmandu'}</span>
                             </div>
-                            
-                            <button
-                                onClick={() => setIsFavorite(!isFavorite)}
-                                style={{ background: 'none', border: 'none', color: isFavorite ? 'var(--primary-red)' : '#ccc' }}
-                            >
-                                <Heart fill={isFavorite ? 'var(--primary-red)' : 'none'} size={24} />
-                            </button>
                         </div>
                     </div>
 
                     {/* Title - Full Title Shown */}
-                    <div style={{ backgroundColor: 'white', padding: '1rem 1.25rem', marginTop: '1px' }}>
+                    <div style={{ backgroundColor: 'white', padding: '0.75rem 1.25rem', marginTop: '1px' }}>
                         <h1 style={{ fontSize: 'clamp(1.1rem, 4vw, 1.5rem)', fontWeight: '800', lineHeight: '1.3', color: 'var(--text-dark)', margin: 0 }}>
                             {product.title}
                         </h1>
                     </div>
 
                     {/* Delivery Section */}
-                    <div style={{ backgroundColor: 'white', padding: '15px', marginTop: '10px' }}>
-                        <div style={{ display: 'flex', gap: '12px', marginBottom: '15px' }}>
+                    <div style={{ backgroundColor: 'white', padding: '12px', marginTop: '1px' }}>
+                        <div style={{ display: 'flex', gap: '12px', marginBottom: '10px' }}>
                             <Truck size={18} color="#2dd4bf" />
                             <div style={{ flex: 1 }}>
                                 <div style={{ display: 'flex', justifyContent: 'space-between' }}>
@@ -691,7 +721,7 @@ const ProductDetail = () => {
                                 </div>
                             </div>
                         </div>
-                        <div style={{ display: 'flex', gap: '12px', borderTop: '0.5px solid #eee', paddingTop: '15px' }}>
+                        <div style={{ display: 'flex', gap: '12px', borderTop: '0.5px solid #eee', paddingTop: '10px' }}>
                             <ShieldCheck size={18} color="var(--primary-red)" />
                             <div style={{ flex: 1, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                                 <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap' }}>
@@ -795,7 +825,7 @@ const ProductDetail = () => {
 
                         {/* Individual Reviews */}
                         <div style={{ display: 'flex', flexDirection: 'column', gap: '15px' }}>
-                            {ratings.map((rev) => (
+                            {ratings.slice(0, 3).map((rev) => (
                                 <div key={rev.id} style={{ borderBottom: '1px solid #f1f5f9', paddingBottom: '15px' }}>
                                     <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '8px' }}>
                                         <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
@@ -815,9 +845,138 @@ const ProductDetail = () => {
                                 </div>
                             ))}
                         </div>
+
+                        {/* See More → All Reviews Page */}
+                        {ratings.length > 3 && (
+                            <button
+                                onClick={() => navigate(`/product/${id}/reviews`)}
+                                style={{
+                                    alignSelf: 'center',
+                                    background: 'none',
+                                    border: '1.5px solid #e2e8f0',
+                                    borderRadius: '999px',
+                                    padding: '8px 24px',
+                                    fontSize: '0.85rem',
+                                    fontWeight: '700',
+                                    color: '#1e293b',
+                                    cursor: 'pointer',
+                                    display: 'flex',
+                                    alignItems: 'center',
+                                    gap: '6px',
+                                    transition: 'all 0.2s'
+                                }}
+                                onMouseEnter={e => e.currentTarget.style.borderColor = 'var(--primary-red)'}
+                                onMouseLeave={e => e.currentTarget.style.borderColor = '#e2e8f0'}
+                            >
+                                See More ({ratings.length - 3} more) <ChevronRight size={16} />
+                            </button>
+                        )}
                     </div>
                 )}
             </div>
+
+            {/* Vendor Store Info Card (Only if product is of vendor) */}
+            {product?.vendor_id && vendorProfile && (
+                <div style={{
+                    backgroundColor: 'white',
+                    padding: '20px',
+                    maxWidth: '1100px',
+                    margin: '15px auto',
+                    borderRadius: '16px',
+                    border: '1px solid #e2e8f0',
+                    boxShadow: '0 4px 15px rgba(0,0,0,0.03)'
+                }}>
+                    <Link
+                        to={`/store/${storeSlug(vendorProfile)}`}
+                        state={{ from: location.pathname }}
+                        style={{ display: 'flex', alignItems: 'center', gap: '16px', marginBottom: '14px', textDecoration: 'none', cursor: 'pointer' }}
+                    >
+                        {vendorProfile.avatar_url ? (
+                            <img
+                                src={vendorProfile.avatar_url}
+                                alt={vendorProfile.store_name || 'Store logo'}
+                                style={{
+                                    width: '52px', height: '52px', borderRadius: '16px',
+                                    objectFit: 'cover', border: '2px solid #f1f5f9',
+                                    boxShadow: '0 4px 12px rgba(0,0,0,0.08)'
+                                }}
+                            />
+                        ) : (
+                            <div style={{
+                                width: '52px', height: '52px', borderRadius: '16px',
+                                background: 'linear-gradient(135deg, var(--primary-red, #f43f5e), #e11d48)',
+                                color: 'white', display: 'flex', alignItems: 'center', justifyContent: 'center',
+                                fontWeight: '900', fontSize: '1.4rem', boxShadow: '0 4px 12px rgba(225,29,72,0.25)'
+                            }}>
+                                <Store size={26} />
+                            </div>
+                        )}
+                        <div style={{ flex: 1 }}>
+                            <h4 style={{ fontSize: '1.1rem', fontWeight: '800', color: '#0f172a', margin: 0, display: 'flex', alignItems: 'center', gap: '6px', flexWrap: 'wrap' }}>
+                                {vendorProfile.store_name || vendorProfile.full_name || 'Vendor Partner Store'}
+                                {vendorProfile.is_verified && (
+                                    <span
+                                        title="Verified Store"
+                                        style={{
+                                            display: 'inline-flex', alignItems: 'center', gap: '3px',
+                                            background: '#ecfdf5', color: '#059669', border: '1px solid #a7f3d0',
+                                            borderRadius: '999px', padding: '2px 8px', fontSize: '0.62rem',
+                                            fontWeight: '800', letterSpacing: '0.04em'
+                                        }}
+                                    >
+                                        <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round">
+                                            <path d="M20 13c0 5-3.5 7.5-7.66 8.95a1 1 0 0 1-.67-.01C7.5 20.5 4 18 4 13V6a1 1 0 0 1 1-1c2 0 4.5-1.2 6.24-2.72a1.17 1.17 0 0 1 1.52 0C14.51 3.81 17 5 19 5a1 1 0 0 1 1 1z" />
+                                            <path d="m9 12 2 2 4-4" />
+                                        </svg>
+                                        Verified
+                                    </span>
+                                )}
+                            </h4>
+                            <p style={{ fontSize: '0.8rem', color: '#64748b', margin: '3px 0 0 0' }}>
+                                {vendorProfile.city || vendorProfile.address ? `${vendorProfile.city || ''} ${vendorProfile.address || ''}` : 'Official Shopy Nepal Partner Store'}
+                            </p>
+                        </div>
+                    </Link>
+
+                    <div style={{
+                        display: 'flex', alignItems: 'stretch', marginBottom: '14px',
+                        padding: '10px 0', borderTop: '1px solid #f1f5f9', borderBottom: '1px solid #f1f5f9'
+                    }}>
+                        <div style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: '4px' }}>
+                            <div style={{ display: 'flex', alignItems: 'center', gap: '5px', fontSize: '0.75rem', fontWeight: '700', color: '#64748b', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
+                                <Star size={12} fill="#f59e0b" color="#f59e0b" /> Rating
+                            </div>
+                            <span style={{ fontSize: '1.05rem', fontWeight: '900', color: '#0f172a' }}>
+                                {vendorRating ? vendorRating.avg.toFixed(1) : '0.0'}
+                            </span>
+                        </div>
+                        <div style={{ width: '1px', background: '#e2e8f0' }} />
+                        <div style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: '4px' }}>
+                            <div style={{ display: 'flex', alignItems: 'center', gap: '5px', fontSize: '0.75rem', fontWeight: '700', color: '#64748b', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
+                                <Package size={12} color="var(--primary-red, #f43f5e)" /> Products
+                            </div>
+                            <span style={{ fontSize: '1.05rem', fontWeight: '900', color: '#0f172a' }}>{vendorProductCount}</span>
+                        </div>
+                        <div style={{ width: '1px', background: '#e2e8f0' }} />
+                        <div style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: '4px' }}>
+                            <div style={{ display: 'flex', alignItems: 'center', gap: '5px', fontSize: '0.75rem', fontWeight: '700', color: '#64748b', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
+                                <MessageCircle size={12} color="#16a34a" /> Response
+                            </div>
+                            <span style={{ fontSize: '1.05rem', fontWeight: '900', color: '#0f172a' }}>100%</span>
+                        </div>
+                    </div>
+
+                    {vendorProfile.description && (
+                        <p style={{
+                            fontSize: '0.85rem', color: '#475569', lineHeight: '1.6',
+                            background: '#f8fafc', padding: '12px 16px', borderRadius: '12px',
+                            margin: '0 0 14px 0', borderLeft: '3px solid var(--primary-red, #f43f5e)'
+                        }}>
+                            {vendorProfile.description}
+                        </p>
+                    )}
+                </div>
+            )}
 
             {/* Sticky Bottom Bar */}
             <div style={{
@@ -868,14 +1027,19 @@ const ProductDetail = () => {
                         fontSize: '0.9rem',
                         fontWeight: '800',
                         borderRadius: '12px',
-                        backgroundColor: product.is_sold_out ? '#94a3b8' : 'var(--primary-red)',
+                        background: product.is_sold_out ? 'linear-gradient(135deg, #d9363e 0%, var(--primary-red) 100%)' : 'var(--primary-red)',
                         border: 'none',
                         cursor: product.is_sold_out ? 'not-allowed' : 'pointer',
                         lineHeight: '1.2',
                         padding: '4px 0'
                     }}
                 >
-                    {product.is_sold_out ? 'Sold Out' : (
+                    {product.is_sold_out ? (
+                        <>
+                            <span style={{ fontSize: '0.95rem' }}>Sold Out</span>
+                            <span style={{ fontSize: '0.72rem', opacity: 0.7, fontWeight: '700', letterSpacing: '0.04em' }}>RESTOCKING SOON</span>
+                        </>
+                    ) : (
                         <>
                             <span style={{ fontSize: '0.95rem' }}>{product.is_prebook ? 'Pre-Book' : 'Buy Now'}</span>
                             <span style={{ fontSize: '0.8rem', opacity: 0.9, fontWeight: '700' }}>Rs. {activePrice.toLocaleString()}</span>

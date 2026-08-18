@@ -5,11 +5,15 @@ import { useSettings } from './context/SettingsContext';
 import Home from './pages/Home';
 import Shop from './pages/Shop';
 import ProductDetail from './pages/ProductDetail';
+import AllReviews from './pages/AllReviews';
+import StorePage from './pages/StorePage';
 import AdminDashboard from './pages/AdminDashboard';
 import Cart from './pages/Cart';
 import Checkout from './pages/Checkout';
 import Contact from './pages/Contact';
 import MyOrders from './pages/MyOrders';
+import PaymentSuccess from './pages/PaymentSuccess';
+import PaymentFailure from './pages/PaymentFailure';
 import ScrollToTop from './components/ScrollToTop';
 
 function App() {
@@ -30,11 +34,15 @@ function App() {
           <Route path="/" element={<Home />} />
           <Route path="/shop" element={<Shop />} />
           <Route path="/product/:id" element={<ProductDetail />} />
+          <Route path="/product/:id/reviews" element={<AllReviews />} />
+          <Route path="/store/:vendorId" element={<StorePage />} />
           <Route path="/admin/dashboard" element={<AdminDashboard />} />
           <Route path="/cart" element={<Cart />} />
           <Route path="/checkout" element={<Checkout />} />
           <Route path="/contact" element={<Contact />} />
           <Route path="/my-orders" element={<MyOrders />} />
+          <Route path="/payment-success" element={<PaymentSuccess />} />
+          <Route path="/payment-failure" element={<PaymentFailure />} />
         </Routes>
       </main>
       {!hideGlobalElements && <Footer />}

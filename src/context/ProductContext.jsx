@@ -72,12 +72,16 @@ export const ProductProvider = ({ children }) => {
                         is_cod: p.is_cod,
                         is_prepaid: p.is_prepaid,
                         is_prebook: p.is_prebook,
+                        allow_cod: p.allow_cod ?? true,
+                        allow_esewa: p.allow_esewa ?? true,
+                        allow_fonepay: p.allow_fonepay ?? true,
                         is_sold_out: isSoldOut,
                         total_stock: totalStock,
                         variant_count: productVariants.length,
                         sizes: p.sizes || '',
                         sold: p.sold_count,
                         sold_count: p.sold_count,
+                        ad_id: p.ad_id, // Ensure ad_id is available in the context
                         variations: productVariants
                     };
                 });
