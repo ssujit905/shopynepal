@@ -15,6 +15,8 @@ import {
     MoreVertical,
     ChevronRight,
     ChevronLeft,
+    ChevronDown,
+    ChevronUp,
     Play,
     X,
     Star,
@@ -22,7 +24,7 @@ import {
     Loader2,
     Store
 } from 'lucide-react';
-import { useState, useEffect, useMemo } from 'react';
+import { useState, useEffect, useMemo, useRef } from 'react';
 import { supabase } from '../lib/supabase';
 import { storeSlug } from '../lib/storeSlug';
 import { useNotification } from '../context/NotificationContext';
@@ -42,7 +44,7 @@ const ProductDetail = () => {
     const [pickerAction, setPickerAction] = useState('buy');
     const [quantity, setQuantity] = useState(1);
     const [touchStart, setTouchStart] = useState(0);
-    const [isFavorite, setIsFavorite] = useState(false);    const [activeImageIndex, setActiveImageIndex] = useState(0);
+    const [activeImageIndex, setActiveImageIndex] = useState(0);
     const [isFullscreenOpen, setIsFullscreenOpen] = useState(false);
     const [vendorProfile, setVendorProfile] = useState(null);
     const [vendorProductCount, setVendorProductCount] = useState(0);
@@ -151,6 +153,20 @@ const ProductDetail = () => {
     // Ratings state
     const [ratings, setRatings] = useState([]);
     const [loadingRatings, setLoadingRatings] = useState(true);
+
+    // Description expand/collapse
+    const [descriptionExpanded, setDescriptionExpanded] = useState(false);
+    const [descriptionOverflows, setDescriptionOverflows] = useState(false);
+    const descriptionRef = useRef(null);
+
+    useEffect(() => {
+        const el = descriptionRef.current;
+        if (!el || !product?.description) return;
+        if (descriptionExpanded) return;
+        // When collapsed the div is clamped to a max height, so a taller
+        // scrollHeight tells us the description needs a "See more" toggle.
+        setDescriptionOverflows(el.scrollHeight > el.clientHeight + 1);
+    }, [product?.description, descriptionExpanded]);
 
     useEffect(() => {
         if (id) fetchRatings();
@@ -436,7 +452,7 @@ const ProductDetail = () => {
                             paddingTop: 'env(safe-area-inset-top)'
                         }}>
                             <div
-                                onClick={() => navigate(-1)}
+                                onClick={() => navigate('/')}
                                 style={{
                                     width: '44px', height: '44px', borderRadius: '50%',
                                     backgroundColor: 'rgba(255, 255, 255, 0.95)', color: '#0f172a',
@@ -647,37 +663,29 @@ const ProductDetail = () => {
                     </div>
 
                     {/* Pricing Section */}
-                    <div style={{ backgroundColor: 'white', padding: '0.25rem 1rem', marginTop: '1px' }}>
-                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                            <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                                <span style={{ fontSize: '1.75rem', color: 'var(--primary-red)', fontWeight: '900' }}>Rs. {activePrice.toLocaleString()}</span>
-                                {product.is_sold_out && (
-                                    <span style={{
-                                        background: 'linear-gradient(135deg, #d9363e 0%, var(--primary-red) 100%)',
-                                        color: '#fff',
-                                        padding: '6px 11px',
-                                        fontWeight: '800',
-                                        fontSize: '0.65rem',
-                                        borderRadius: '999px',
-                                        textTransform: 'uppercase',
-                                        letterSpacing: '0.1em',
-                                        border: '1px solid rgba(255,255,255,0.2)',
-                                        display: 'inline-flex',
-                                        alignItems: 'center',
-                                        gap: '6px',
-                                        boxShadow: '0 6px 18px rgba(239,68,68,0.24)'
-                                    }}>
-                                        <Sparkles size={12} strokeWidth={2.5} color="#d8b36a" />
-                                        Sold Out
-                                    </span>
-                                )}
-                            </div>
-
-                            {/* Ship from Info */}
-                            <div style={{ display: 'flex', alignItems: 'center', gap: '6px', marginTop: '4px' }}>
-                                <MapPin size={14} color="#64748b" strokeWidth={2.5} />
-                                <span style={{ fontSize: '0.85rem', color: '#64748b', fontWeight: '700' }}>{product.city || 'Kathmandu'}</span>
-                            </div>
+                    <div style={{ backgroundColor: 'white', padding: '0.4rem 1rem', marginTop: '1px' }}>
+                        <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                            <span style={{ fontSize: '1.1rem', color: 'var(--primary-red)', fontWeight: '900' }}>Rs.{activePrice.toLocaleString()}</span>
+                            {product.is_sold_out && (
+                                <span style={{
+                                    background: 'linear-gradient(135deg, #d9363e 0%, var(--primary-red) 100%)',
+                                    color: '#fff',
+                                    padding: '6px 11px',
+                                    fontWeight: '800',
+                                    fontSize: '0.65rem',
+                                    borderRadius: '999px',
+                                    textTransform: 'uppercase',
+                                    letterSpacing: '0.1em',
+                                    border: '1px solid rgba(255,255,255,0.2)',
+                                    display: 'inline-flex',
+                                    alignItems: 'center',
+                                    gap: '6px',
+                                    boxShadow: '0 6px 18px rgba(239,68,68,0.24)'
+                                }}>
+                                    <Sparkles size={12} strokeWidth={2.5} color="#d8b36a" />
+                                    Sold Out
+                                </span>
+                            )}
                         </div>
                     </div>
 
@@ -686,6 +694,21 @@ const ProductDetail = () => {
                         <h1 style={{ fontSize: 'clamp(1.1rem, 4vw, 1.5rem)', fontWeight: '800', lineHeight: '1.3', color: 'var(--text-dark)', margin: 0 }}>
                             {product.title}
                         </h1>
+                    </div>
+
+                    {/* Ship from Section - same design as delivery */}
+                    <div style={{ backgroundColor: 'white', padding: '12px', marginTop: '1px' }}>
+                        <div style={{ display: 'flex', gap: '12px' }}>
+                            <MapPin size={18} color="#64748b" />
+                            <div style={{ flex: 1 }}>
+                                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                                    <span style={{ fontSize: '0.9rem', color: '#333' }}>
+                                        {product.city || 'Kathmandu'}
+                                    </span>
+                                    <ChevronRight size={16} color="#ccc" />
+                                </div>
+                            </div>
+                        </div>
                     </div>
 
                     {/* Delivery Section */}
@@ -761,15 +784,38 @@ const ProductDetail = () => {
                 }}>
                     Description
                 </h3>
-                <div style={{ 
+                <div ref={descriptionRef} style={{ 
                     fontSize: '0.95rem', 
                     color: '#444', 
                     lineHeight: '1.6', 
                     whiteSpace: 'pre-wrap', 
-                    wordBreak: 'break-word'
+                    wordBreak: 'break-word',
+                    maxHeight: descriptionExpanded ? 'none' : '100px',
+                    overflow: 'hidden',
+                    transition: 'max-height 0.3s ease'
                 }}>
                     {product.description || 'No description provided for this product.'}
                 </div>
+                {descriptionOverflows && (
+                    <button
+                        onClick={() => setDescriptionExpanded(prev => !prev)}
+                        style={{
+                            marginTop: '8px',
+                            display: 'inline-flex',
+                            alignItems: 'center',
+                            gap: '4px',
+                            background: 'none',
+                            border: 'none',
+                            padding: 0,
+                            cursor: 'pointer',
+                            fontSize: '0.85rem',
+                            fontWeight: '700',
+                            color: 'var(--primary-red)'
+                        }}
+                    >
+                        {descriptionExpanded ? <>See less <ChevronUp size={16} /></> : <>See more <ChevronDown size={16} /></>}
+                    </button>
+                )}
             </div>
 
             {/* Ratings & Reviews Section */}
@@ -1042,7 +1088,7 @@ const ProductDetail = () => {
                     ) : (
                         <>
                             <span style={{ fontSize: '0.95rem' }}>{product.is_prebook ? 'Pre-Book' : 'Buy Now'}</span>
-                            <span style={{ fontSize: '0.8rem', opacity: 0.9, fontWeight: '700' }}>Rs. {activePrice.toLocaleString()}</span>
+                            <span style={{ fontSize: '0.8rem', opacity: 0.9, fontWeight: '700' }}>Rs.{activePrice.toLocaleString()}</span>
                         </>
                     )}
                 </button>
@@ -1062,7 +1108,7 @@ const ProductDetail = () => {
                                 <img src={images[activeImageIndex]?.image_url} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
                             </div>
                             <div style={{ flex: 1, display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
-                                <p style={{ fontSize: '1.25rem', fontWeight: '900', color: 'var(--primary-red)', margin: 0 }}>Rs. {activePrice.toLocaleString()}</p>
+                                <p style={{ fontSize: '1.05rem', fontWeight: '900', color: 'var(--primary-red)', margin: 0 }}>Rs.{activePrice.toLocaleString()}</p>
                                 <p style={{ fontSize: '0.8rem', color: 'var(--text-gray)', marginTop: '2px' }}>
                                     {images[activeImageIndex]?.label ? `Variation: ${images[activeImageIndex].label}` : 'Select Variation'}
                                 </p>
