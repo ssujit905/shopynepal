@@ -202,6 +202,7 @@ const StorePage = () => {
                                     <img
                                         src={vendorProfile.avatar_url}
                                         alt={storeName}
+                                        decoding="async"
                                         style={{
                                             width: '56px', height: '56px', borderRadius: '16px',
                                             objectFit: 'cover', border: '2px solid #f1f5f9',

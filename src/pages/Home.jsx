@@ -137,6 +137,11 @@ const Home = () => {
                                         <img 
                                             src={slide.image} 
                                             alt="Hero Banner" 
+                                            // First real slide is the LCP element: load it eagerly
+                                            // with high priority; clones and others lazy.
+                                            loading={idx === 1 ? 'eager' : 'lazy'}
+                                            fetchpriority={idx === 1 ? 'high' : 'auto'}
+                                            decoding="async"
                                             style={{ width: '100%', height: '100%', objectFit: 'cover' }} 
                                         />
                                     </div>
@@ -284,7 +289,7 @@ const Home = () => {
                                             {product.discount}% OFF
                                         </div>
 
-                                        <img src={product.image} alt={product.title} style={{ width: '100%', aspectRatio: '1/1', objectFit: 'cover' }} />
+                                        <img src={product.image} alt={product.title} loading="lazy" decoding="async" style={{ width: '100%', aspectRatio: '1/1', objectFit: 'cover' }} />
                                         
                                         <div style={{ padding: '8px', flex: 1, display: 'flex', flexDirection: 'column', justifyContent: 'space-between' }}>
                                             <div>

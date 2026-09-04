@@ -577,6 +577,10 @@ const ProductDetail = () => {
                                     key={activeImageIndex}
                                     src={activeMedia?.image_url}
                                     alt={product.title}
+                                    // Main gallery image is the PDP LCP element
+                                    loading="eager"
+                                    fetchpriority="high"
+                                    decoding="async"
                                     onClick={() => setIsFullscreenOpen(true)}
                                     style={{ 
                                         width: '100%', height: '100%', objectFit: 'cover',
@@ -655,7 +659,7 @@ const ProductDetail = () => {
                                             <Play size={16} fill="white" color="white" />
                                         </div>
                                     ) : (
-                                        <img src={item.image_url} style={{ width: '100%', height: '100%', objectFit: 'cover', opacity: activeImageIndex === i ? 1 : 0.7 }} />
+                                        <img src={item.image_url} alt="" loading="lazy" decoding="async" style={{ width: '100%', height: '100%', objectFit: 'cover', opacity: activeImageIndex === i ? 1 : 0.7 }} />
                                     )}
                                 </div>
                             ))}
@@ -941,6 +945,8 @@ const ProductDetail = () => {
                             <img
                                 src={vendorProfile.avatar_url}
                                 alt={vendorProfile.store_name || 'Store logo'}
+                                loading="lazy"
+                                decoding="async"
                                 style={{
                                     width: '52px', height: '52px', borderRadius: '16px',
                                     objectFit: 'cover', border: '2px solid #f1f5f9',
@@ -1105,7 +1111,7 @@ const ProductDetail = () => {
                         {/* Header: Small Img + Title */}
                         <div style={{ display: 'flex', gap: '1rem', marginBottom: '1.5rem', borderBottom: '1px solid var(--border-color)', paddingBottom: '1rem' }}>
                             <div className="card" style={{ width: '80px', height: '80px', borderRadius: '0.75rem', flexShrink: 0 }}>
-                                <img src={images[activeImageIndex]?.image_url} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                                <img src={images[activeImageIndex]?.image_url} alt="" loading="lazy" decoding="async" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
                             </div>
                             <div style={{ flex: 1, display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
                                 <p style={{ fontSize: '1.05rem', fontWeight: '900', color: 'var(--primary-red)', margin: 0 }}>Rs.{activePrice.toLocaleString()}</p>
@@ -1284,6 +1290,7 @@ const ProductDetail = () => {
                         key={activeImageIndex}
                         src={images[activeImageIndex]?.image_url} 
                         alt={product.title}
+                        decoding="async"
                         style={{
                             maxWidth: '100vw', maxHeight: '100vh', 
                             objectFit: 'contain', animation: 'fadeIn 0.3s ease-out'
