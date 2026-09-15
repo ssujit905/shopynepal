@@ -28,6 +28,7 @@ import { useState, useEffect, useMemo, useRef } from 'react';
 import { supabase } from '../lib/supabase';
 import { storeSlug } from '../lib/storeSlug';
 import { useNotification } from '../context/NotificationContext';
+import { trackFunnelEvent } from '../lib/analyticsTracker';
 
 const ProductDetail = () => {
     const { id } = useParams();
@@ -96,6 +97,11 @@ const ProductDetail = () => {
                 
                 if (!p) return;
                 setProduct(p);
+                trackFunnelEvent('view_product', {
+                    productId: p.id,
+                    productTitle: p.title,
+                    metadata: { price: p.price, category: p.category, vendor_id: p.vendor_id }
+                });
 
                 // Fetch vendor store info if product belongs to a vendor
                 if (p.vendor_id) {
@@ -347,6 +353,16 @@ const ProductDetail = () => {
                 }
             }
             addToCart(cartItem);
+            trackFunnelEvent('add_to_cart', {
+                productId: cartItem.id,
+                productTitle: cartItem.title,
+                cartTotal: (Number(cartItem.price) || 0) * (Number(cartItem.quantity) || 1),
+                metadata: {
+                    size: cartItem.size || null,
+                    color: cartItem.color || null,
+                    quantity: cartItem.quantity || 1
+                }
+            });
             setIsPickerOpen(false);
             showNotification('Item added to your cart!', 'success');
             animateToCart(e, cartItem.image);
@@ -579,7 +595,7 @@ const ProductDetail = () => {
                                     alt={product.title}
                                     // Main gallery image is the PDP LCP element
                                     loading="eager"
-                                    fetchpriority="high"
+                                    fetchPriority="high"
                                     decoding="async"
                                     onClick={() => setIsFullscreenOpen(true)}
                                     style={{ 

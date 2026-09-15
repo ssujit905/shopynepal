@@ -1,9 +1,10 @@
-import { Suspense, lazy } from 'react';
+import { Suspense, lazy, useEffect } from 'react';
 import { Routes, Route, useLocation } from 'react-router-dom';
 import Header from './components/Header';
 import Footer from './components/Footer';
 import { useSettings } from './context/SettingsContext';
 import ScrollToTop from './components/ScrollToTop';
+import { trackPageView } from './lib/analyticsTracker';
 
 // PERF: route-level code-splitting so the homepage doesn't ship Checkout,
 // MyOrders (heic2any), StorePage, etc. Each page becomes its own chunk
@@ -32,6 +33,12 @@ function App() {
   const isProductDetail = location.pathname.startsWith('/product/');
   const { settings } = useSettings();
   const supportPhone = settings.support_phone || settings.store_phone || '9779845877777'; 
+
+  // Automatic analytics: track page views across routes
+  useEffect(() => {
+    trackPageView(location.pathname);
+  }, [location.pathname]);
+
   // NOTE: there is intentionally no /admin surface on the public website.
   // Staff/admin tooling lives in the inventory desktop/mobile apps behind
   // Supabase Auth + is_admin_or_staff() RLS.

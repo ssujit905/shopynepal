@@ -5,6 +5,7 @@ import { useNavigate, useLocation } from 'react-router-dom';
 import { supabase } from '../lib/supabase';
 import { useCustomer } from '../context/CustomerContext';
 import { useNotification } from '../context/NotificationContext';
+import { trackFunnelEvent } from '../lib/analyticsTracker';
 
 const Checkout = () => {
     const { cart, cartTotal, clearCart, clearSelectedItems } = useCart();
@@ -74,6 +75,19 @@ const Checkout = () => {
         const clearPaymentRedirect = () => setPaymentRedirecting(false);
         window.addEventListener('pageshow', clearPaymentRedirect);
         return () => window.removeEventListener('pageshow', clearPaymentRedirect);
+    }, []);
+
+    // Telemetry: record begin_checkout funnel step
+    useEffect(() => {
+        if (checkoutItems.length > 0) {
+            trackFunnelEvent('begin_checkout', {
+                cartTotal: checkoutSubtotal,
+                metadata: {
+                    itemCount: checkoutItems.length,
+                    isBuyNow
+                }
+            });
+        }
     }, []);
 
     useEffect(() => {
@@ -420,6 +434,17 @@ const Checkout = () => {
                     setPlacedTotal(Number(result.total_amount));
                 }
 
+                // Telemetry: record successful order
+                trackFunnelEvent('order_completed', {
+                    cartTotal: Number(result.total_amount || checkoutSubtotal),
+                    stepName: 'completed',
+                    metadata: {
+                        orderNumber: result.order_number,
+                        paymentMethod: formData.paymentMethod,
+                        city: formData.city
+                    }
+                });
+
                 // COD: show local success screen
                 setOrderNumber(result.order_number);
                 setIsOrdered(true);
@@ -432,6 +457,12 @@ const Checkout = () => {
             }
         } catch (err) {
             setPaymentRedirecting(false);
+            trackFunnelEvent('abandon_checkout', {
+                cartTotal: checkoutSubtotal,
+                stepName: 'order_submission',
+                dropReason: err.message || 'Submission error',
+                metadata: { paymentMethod: formData.paymentMethod }
+            });
             showNotification('Order failed: ' + (err.message || 'Please try again'), 'error');
         } finally {
             setSaving(false);
