@@ -9,10 +9,35 @@ import {
     Truck, CheckCircle, Clock, AlertCircle, ShoppingBag, Coins,
     Calendar, MapPin, Info, XCircle, X,
     Star, RotateCcw, Camera, Trash2, CheckCircle2, Loader2,
-    ArrowLeft
+    ArrowLeft, Eye, EyeOff
 } from 'lucide-react';
 import { useNotification } from '../context/NotificationContext';
 import { thumbUrl } from '../lib/imageUrl';
+
+const PinEyeToggle = ({ visible, onToggle }) => (
+    <button
+        type="button"
+        onClick={onToggle}
+        aria-label={visible ? 'Hide PIN' : 'Show PIN'}
+        title={visible ? 'Hide PIN' : 'Show PIN'}
+        style={{
+            position: 'absolute',
+            right: '0.85rem',
+            top: '50%',
+            transform: 'translateY(-50%)',
+            background: 'none',
+            border: 'none',
+            cursor: 'pointer',
+            color: '#94a3b8',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            padding: '0.25rem'
+        }}
+    >
+        {visible ? <EyeOff size={18} /> : <Eye size={18} />}
+    </button>
+);
 
 const MyOrders = () => {
     const { customer, login, register, loading: authLoading, refreshCustomer, setupPin } = useCustomer();
@@ -36,6 +61,7 @@ const MyOrders = () => {
     const [regName, setRegName] = useState('');
     const [regPhone, setRegPhone] = useState('');
     const [regPin, setRegPin] = useState('');
+    const [showLoginPin, setShowLoginPin] = useState(false);
     const [error, setError] = useState('');
 
     // Modals
@@ -63,6 +89,9 @@ const MyOrders = () => {
     const [currentPin, setCurrentPin] = useState('');
     const [newPin, setNewPin] = useState('');
     const [confirmPin, setConfirmPin] = useState('');
+    const [showCurrentPin, setShowCurrentPin] = useState(false);
+    const [showNewPin, setShowNewPin] = useState(false);
+    const [showConfirmPin, setShowConfirmPin] = useState(false);
     const [pinLoading, setPinLoading] = useState(false);
     const [pinMsg, setPinMsg] = useState({ text: '', type: '' });
 
@@ -72,6 +101,8 @@ const MyOrders = () => {
     const [setupPinName, setSetupPinName] = useState('');
     const [setupPinValue, setSetupPinValue] = useState('');
     const [setupPinConfirm, setSetupPinConfirm] = useState('');
+    const [showSetupPinValue, setShowSetupPinValue] = useState(false);
+    const [showSetupPinConfirm, setShowSetupPinConfirm] = useState(false);
     const [setupPinLoading, setSetupPinLoading] = useState(false);
     const [setupPinError, setSetupPinError] = useState('');
 
@@ -497,29 +528,35 @@ const MyOrders = () => {
                                 </div>
                                 <div>
                                     <label style={{ fontSize: '0.8rem', fontWeight: '800', color: '#374151', marginBottom: '0.4rem', display: 'block', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Choose PIN</label>
-                                    <input
-                                        type="password"
-                                        maxLength={4}
-                                        value={setupPinValue}
-                                        onChange={e => setSetupPinValue(e.target.value.replace(/\D/g, ''))}
-                                        placeholder="• • • •"
-                                        style={{ width: '100%', padding: '0.9rem 1.25rem', borderRadius: '12px', border: '2px solid #e2e8f0', fontSize: '1.5rem', fontWeight: '900', letterSpacing: '0.5em', textAlign: 'center', outline: 'none', boxSizing: 'border-box', transition: 'border-color 0.2s' }}
-                                        onFocus={e => e.target.style.borderColor = '#ef4444'}
-                                        onBlur={e => e.target.style.borderColor = '#e2e8f0'}
-                                    />
+                                    <div style={{ position: 'relative' }}>
+                                        <input
+                                            type={showSetupPinValue ? 'text' : 'password'}
+                                            maxLength={4}
+                                            value={setupPinValue}
+                                            onChange={e => setSetupPinValue(e.target.value.replace(/\D/g, ''))}
+                                            placeholder="• • • •"
+                                            style={{ width: '100%', padding: '0.9rem 1.25rem', paddingLeft: '3rem', paddingRight: '3rem', borderRadius: '12px', border: '2px solid #e2e8f0', fontSize: '1.5rem', fontWeight: '900', letterSpacing: '0.5em', textAlign: 'center', outline: 'none', boxSizing: 'border-box', transition: 'border-color 0.2s' }}
+                                            onFocus={e => e.target.style.borderColor = '#ef4444'}
+                                            onBlur={e => e.target.style.borderColor = '#e2e8f0'}
+                                        />
+                                        <PinEyeToggle visible={showSetupPinValue} onToggle={() => setShowSetupPinValue(v => !v)} />
+                                    </div>
                                 </div>
                                 <div>
                                     <label style={{ fontSize: '0.8rem', fontWeight: '800', color: '#374151', marginBottom: '0.4rem', display: 'block', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Confirm PIN</label>
-                                    <input
-                                        type="password"
-                                        maxLength={4}
-                                        value={setupPinConfirm}
-                                        onChange={e => setSetupPinConfirm(e.target.value.replace(/\D/g, ''))}
-                                        placeholder="• • • •"
-                                        style={{ width: '100%', padding: '0.9rem 1.25rem', borderRadius: '12px', border: '2px solid #e2e8f0', fontSize: '1.5rem', fontWeight: '900', letterSpacing: '0.5em', textAlign: 'center', outline: 'none', boxSizing: 'border-box', transition: 'border-color 0.2s' }}
-                                        onFocus={e => e.target.style.borderColor = '#ef4444'}
-                                        onBlur={e => e.target.style.borderColor = '#e2e8f0'}
-                                    />
+                                    <div style={{ position: 'relative' }}>
+                                        <input
+                                            type={showSetupPinConfirm ? 'text' : 'password'}
+                                            maxLength={4}
+                                            value={setupPinConfirm}
+                                            onChange={e => setSetupPinConfirm(e.target.value.replace(/\D/g, ''))}
+                                            placeholder="• • • •"
+                                            style={{ width: '100%', padding: '0.9rem 1.25rem', paddingLeft: '3rem', paddingRight: '3rem', borderRadius: '12px', border: '2px solid #e2e8f0', fontSize: '1.5rem', fontWeight: '900', letterSpacing: '0.5em', textAlign: 'center', outline: 'none', boxSizing: 'border-box', transition: 'border-color 0.2s' }}
+                                            onFocus={e => e.target.style.borderColor = '#ef4444'}
+                                            onBlur={e => e.target.style.borderColor = '#e2e8f0'}
+                                        />
+                                        <PinEyeToggle visible={showSetupPinConfirm} onToggle={() => setShowSetupPinConfirm(v => !v)} />
+                                    </div>
                                 </div>
 
                                 {setupPinError && (
@@ -560,7 +597,10 @@ const MyOrders = () => {
                         )}
                         <input required type="tel" maxLength={10} className="form-input" placeholder="Phone Number" value={isRegistering ? regPhone : phone} onChange={e => isRegistering ? setRegPhone(e.target.value.replace(/\D/g, '')) : setPhone(e.target.value.replace(/\D/g, ''))} style={{ padding: '0.85rem 1.25rem', borderRadius: '12px', border: '1px solid var(--border-color)', background: '#f8fafc', fontWeight: '600' }} />
                         
-                        <input required type="password" maxLength={4} className="form-input" placeholder="4-Digit PIN" value={isRegistering ? regPin : pin} onChange={e => isRegistering ? setRegPin(e.target.value.replace(/\D/g, '')) : setPin(e.target.value.replace(/\D/g, ''))} style={{ padding: '0.85rem 1.25rem', borderRadius: '12px', border: '1px solid var(--border-color)', background: '#f8fafc', fontWeight: '900', letterSpacing: '0.2em' }} />
+                        <div style={{ position: 'relative' }}>
+                            <input required type={showLoginPin ? 'text' : 'password'} maxLength={4} className="form-input" placeholder="4-Digit PIN" value={isRegistering ? regPin : pin} onChange={e => isRegistering ? setRegPin(e.target.value.replace(/\D/g, '')) : setPin(e.target.value.replace(/\D/g, ''))} style={{ width: '100%', boxSizing: 'border-box', padding: '0.85rem 1.25rem', paddingRight: '3rem', borderRadius: '12px', border: '1px solid var(--border-color)', background: '#f8fafc', fontWeight: '900', letterSpacing: '0.2em' }} />
+                            <PinEyeToggle visible={showLoginPin} onToggle={() => setShowLoginPin(v => !v)} />
+                        </div>
                         
                         {error && <p style={{ color: 'var(--primary-red)', fontSize: '0.8rem', fontWeight: '700', textAlign: 'center' }}>{error}</p>}
                         
@@ -878,8 +918,9 @@ const MyOrders = () => {
                                             })()}
                                             {/* Return button on the right — 2-day window only */}
                                             {(() => {
-                                                const daysSinceDelivery = (Date.now() - new Date(order.updated_at).getTime()) / (1000 * 60 * 60 * 24);
-                                                const withinWindow = daysSinceDelivery <= 2;
+                                                const deliveredAt = order.delivered_at || order.updated_at;
+                                                const daysSinceDelivery = (Date.now() - new Date(deliveredAt).getTime()) / (1000 * 60 * 60 * 24);
+                                                const withinWindow = deliveredAt && daysSinceDelivery <= 2;
                                                 if (requestedReturnStatuses[order.id]) {
                                                     return (
                                                         <span style={{ fontSize: '0.75rem', color: 'var(--primary-blue)', fontWeight: '800', display: 'flex', alignItems: 'center', gap: '6px', background: '#f8fafc', padding: '0.4rem 0.8rem', borderRadius: '100px', border: '1px solid var(--border-color)' }}>
@@ -1027,15 +1068,24 @@ const MyOrders = () => {
                         <form onSubmit={handleChangePin} style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
                                 <div>
                                     <label style={{ display: 'block', fontSize: '0.8rem', fontWeight: '800', color: '#475569', marginBottom: '0.4rem' }}>Current PIN</label>
-                                    <input required type="password" maxLength={4} value={currentPin} onChange={e => setCurrentPin(e.target.value.replace(/\D/g, ''))} placeholder="Current 4-digit PIN" style={{ width: '100%', padding: '0.85rem 1.1rem', borderRadius: '12px', border: '1.5px solid #e2e8f0', background: '#f8fafc', fontWeight: '900', letterSpacing: '0.2em', fontSize: '1.1rem' }} />
+                                    <div style={{ position: 'relative' }}>
+                                        <input required type={showCurrentPin ? 'text' : 'password'} maxLength={4} value={currentPin} onChange={e => setCurrentPin(e.target.value.replace(/\D/g, ''))} placeholder="Current 4-digit PIN" style={{ width: '100%', boxSizing: 'border-box', padding: '0.85rem 1.1rem', paddingRight: '3rem', borderRadius: '12px', border: '1.5px solid #e2e8f0', background: '#f8fafc', fontWeight: '900', letterSpacing: '0.2em', fontSize: '1.1rem' }} />
+                                        <PinEyeToggle visible={showCurrentPin} onToggle={() => setShowCurrentPin(v => !v)} />
+                                    </div>
                                 </div>
                                 <div>
                                     <label style={{ display: 'block', fontSize: '0.8rem', fontWeight: '800', color: '#475569', marginBottom: '0.4rem' }}>New PIN</label>
-                                    <input required type="password" maxLength={4} value={newPin} onChange={e => setNewPin(e.target.value.replace(/\D/g, ''))} placeholder="New 4-digit PIN" style={{ width: '100%', padding: '0.85rem 1.1rem', borderRadius: '12px', border: '1.5px solid #e2e8f0', background: '#f8fafc', fontWeight: '900', letterSpacing: '0.2em', fontSize: '1.1rem' }} />
+                                    <div style={{ position: 'relative' }}>
+                                        <input required type={showNewPin ? 'text' : 'password'} maxLength={4} value={newPin} onChange={e => setNewPin(e.target.value.replace(/\D/g, ''))} placeholder="New 4-digit PIN" style={{ width: '100%', boxSizing: 'border-box', padding: '0.85rem 1.1rem', paddingRight: '3rem', borderRadius: '12px', border: '1.5px solid #e2e8f0', background: '#f8fafc', fontWeight: '900', letterSpacing: '0.2em', fontSize: '1.1rem' }} />
+                                        <PinEyeToggle visible={showNewPin} onToggle={() => setShowNewPin(v => !v)} />
+                                    </div>
                                 </div>
                                 <div>
                                     <label style={{ display: 'block', fontSize: '0.8rem', fontWeight: '800', color: '#475569', marginBottom: '0.4rem' }}>Confirm New PIN</label>
-                                    <input required type="password" maxLength={4} value={confirmPin} onChange={e => setConfirmPin(e.target.value.replace(/\D/g, ''))} placeholder="Confirm new PIN" style={{ width: '100%', padding: '0.85rem 1.1rem', borderRadius: '12px', border: '1.5px solid #e2e8f0', background: '#f8fafc', fontWeight: '900', letterSpacing: '0.2em', fontSize: '1.1rem' }} />
+                                    <div style={{ position: 'relative' }}>
+                                        <input required type={showConfirmPin ? 'text' : 'password'} maxLength={4} value={confirmPin} onChange={e => setConfirmPin(e.target.value.replace(/\D/g, ''))} placeholder="Confirm new PIN" style={{ width: '100%', boxSizing: 'border-box', padding: '0.85rem 1.1rem', paddingRight: '3rem', borderRadius: '12px', border: '1.5px solid #e2e8f0', background: '#f8fafc', fontWeight: '900', letterSpacing: '0.2em', fontSize: '1.1rem' }} />
+                                        <PinEyeToggle visible={showConfirmPin} onToggle={() => setShowConfirmPin(v => !v)} />
+                                    </div>
                                     {confirmPin && confirmPin !== newPin && (
                                         <p style={{ color: '#ef4444', fontSize: '0.75rem', fontWeight: '700', marginTop: '0.3rem' }}>PINs do not match</p>
                                     )}
