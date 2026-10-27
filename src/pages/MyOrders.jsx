@@ -491,43 +491,43 @@ const MyOrders = () => {
             <>
                 {/* ── PIN Setup Modal (first-time buyers) ─────────────────────── */}
                 {showSetupPinModal && (
-                    <div style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.55)', backdropFilter: 'blur(6px)', zIndex: 9999, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '1.5rem' }}>
-                        <div style={{ background: 'white', borderRadius: '2rem', padding: '2.5rem', width: '100%', maxWidth: '420px', boxShadow: '0 30px 80px rgba(0,0,0,0.2)', position: 'relative', animation: 'slideUp 0.3s ease' }}>
+                    <div style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.55)', backdropFilter: 'blur(6px)', zIndex: 9999, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '1rem' }}>
+                        <div style={{ background: 'white', borderRadius: '1.5rem', padding: '1.5rem 1.75rem', width: '100%', maxWidth: '400px', maxHeight: 'min(92vh, 660px)', overflowY: 'auto', boxShadow: '0 25px 60px rgba(0,0,0,0.25)', position: 'relative', animation: 'slideUp 0.3s ease', boxSizing: 'border-box' }}>
                             {/* Header */}
-                            <div style={{ textAlign: 'center', marginBottom: '1.75rem' }}>
-                                <div style={{ margin: '0 auto 1.25rem', display: 'flex', justifyContent: 'center' }}>
+                            <div style={{ textAlign: 'center', marginBottom: '0.85rem' }}>
+                                <div style={{ margin: '0 auto 0.4rem', display: 'flex', justifyContent: 'center' }}>
                                     <img
                                         src="/logo.png"
                                         alt="Shopy Nepal"
                                         decoding="async"
-                                        style={{ height: '64px', width: 'auto', objectFit: 'contain' }}
+                                        style={{ height: '42px', width: 'auto', objectFit: 'contain' }}
                                     />
                                 </div>
-                                <h2 style={{ fontWeight: '900', fontSize: '1.35rem', color: '#111827', margin: '0 0 0.4rem 0' }}>Set Your Account PIN</h2>
-                                <p style={{ color: '#64748b', fontSize: '0.875rem', lineHeight: '1.5' }}>
+                                <h2 style={{ fontWeight: '900', fontSize: '1.2rem', color: '#111827', margin: '0 0 0.2rem 0' }}>Set Your Account PIN</h2>
+                                <p style={{ color: '#64748b', fontSize: '0.8rem', lineHeight: '1.4', margin: 0 }}>
                                     Choose a 4-digit PIN to access your orders anytime.
                                 </p>
-                                <div style={{ background: '#f0fdf4', border: '1px solid #a7f3d0', borderRadius: '10px', padding: '0.6rem 1rem', marginTop: '0.75rem', display: 'inline-block' }}>
-                                    <p style={{ fontSize: '0.8rem', fontWeight: '700', color: '#059669', margin: 0 }}>📱 Phone: {setupPinPhone}</p>
+                                <div style={{ background: '#f0fdf4', border: '1px solid #a7f3d0', borderRadius: '8px', padding: '0.35rem 0.75rem', marginTop: '0.45rem', display: 'inline-block' }}>
+                                    <p style={{ fontSize: '0.78rem', fontWeight: '700', color: '#059669', margin: 0 }}>📱 Phone: {setupPinPhone}</p>
                                 </div>
                             </div>
 
-                            <form onSubmit={handleSetupPin} style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+                            <form onSubmit={handleSetupPin} style={{ display: 'flex', flexDirection: 'column', gap: '0.65rem' }}>
                                 <div>
-                                    <label style={{ fontSize: '0.8rem', fontWeight: '800', color: '#374151', marginBottom: '0.4rem', display: 'block', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Your Full Name</label>
+                                    <label style={{ fontSize: '0.75rem', fontWeight: '800', color: '#374151', marginBottom: '0.25rem', display: 'block', textTransform: 'uppercase', letterSpacing: '0.04em' }}>Your Full Name</label>
                                     <input
                                         type="text"
                                         value={setupPinName}
                                         onChange={e => setSetupPinName(e.target.value)}
                                         placeholder="e.g. Ram Bahadur Thapa"
                                         autoFocus
-                                        style={{ width: '100%', padding: '0.9rem 1.25rem', borderRadius: '12px', border: '2px solid #e2e8f0', fontSize: '0.95rem', fontWeight: '600', outline: 'none', boxSizing: 'border-box', transition: 'border-color 0.2s' }}
+                                        style={{ width: '100%', padding: '0.65rem 0.95rem', borderRadius: '10px', border: '2px solid #e2e8f0', fontSize: '0.9rem', fontWeight: '600', outline: 'none', boxSizing: 'border-box', transition: 'border-color 0.2s' }}
                                         onFocus={e => e.target.style.borderColor = '#ef4444'}
                                         onBlur={e => e.target.style.borderColor = '#e2e8f0'}
                                     />
                                 </div>
                                 <div>
-                                    <label style={{ fontSize: '0.8rem', fontWeight: '800', color: '#374151', marginBottom: '0.4rem', display: 'block', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Choose PIN</label>
+                                    <label style={{ fontSize: '0.75rem', fontWeight: '800', color: '#374151', marginBottom: '0.25rem', display: 'block', textTransform: 'uppercase', letterSpacing: '0.04em' }}>Choose PIN</label>
                                     <div style={{ position: 'relative' }}>
                                         <input
                                             type={showSetupPinValue ? 'text' : 'password'}
@@ -535,7 +535,7 @@ const MyOrders = () => {
                                             value={setupPinValue}
                                             onChange={e => setSetupPinValue(e.target.value.replace(/\D/g, ''))}
                                             placeholder="• • • •"
-                                            style={{ width: '100%', padding: '0.9rem 1.25rem', paddingLeft: '3rem', paddingRight: '3rem', borderRadius: '12px', border: '2px solid #e2e8f0', fontSize: '1.5rem', fontWeight: '900', letterSpacing: '0.5em', textAlign: 'center', outline: 'none', boxSizing: 'border-box', transition: 'border-color 0.2s' }}
+                                            style={{ width: '100%', padding: '0.6rem 0.95rem', paddingLeft: '2.5rem', paddingRight: '2.5rem', borderRadius: '10px', border: '2px solid #e2e8f0', fontSize: '1.25rem', fontWeight: '900', letterSpacing: '0.4em', textAlign: 'center', outline: 'none', boxSizing: 'border-box', transition: 'border-color 0.2s' }}
                                             onFocus={e => e.target.style.borderColor = '#ef4444'}
                                             onBlur={e => e.target.style.borderColor = '#e2e8f0'}
                                         />
@@ -543,7 +543,7 @@ const MyOrders = () => {
                                     </div>
                                 </div>
                                 <div>
-                                    <label style={{ fontSize: '0.8rem', fontWeight: '800', color: '#374151', marginBottom: '0.4rem', display: 'block', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Confirm PIN</label>
+                                    <label style={{ fontSize: '0.75rem', fontWeight: '800', color: '#374151', marginBottom: '0.25rem', display: 'block', textTransform: 'uppercase', letterSpacing: '0.04em' }}>Confirm PIN</label>
                                     <div style={{ position: 'relative' }}>
                                         <input
                                             type={showSetupPinConfirm ? 'text' : 'password'}
@@ -551,7 +551,7 @@ const MyOrders = () => {
                                             value={setupPinConfirm}
                                             onChange={e => setSetupPinConfirm(e.target.value.replace(/\D/g, ''))}
                                             placeholder="• • • •"
-                                            style={{ width: '100%', padding: '0.9rem 1.25rem', paddingLeft: '3rem', paddingRight: '3rem', borderRadius: '12px', border: '2px solid #e2e8f0', fontSize: '1.5rem', fontWeight: '900', letterSpacing: '0.5em', textAlign: 'center', outline: 'none', boxSizing: 'border-box', transition: 'border-color 0.2s' }}
+                                            style={{ width: '100%', padding: '0.6rem 0.95rem', paddingLeft: '2.5rem', paddingRight: '2.5rem', borderRadius: '10px', border: '2px solid #e2e8f0', fontSize: '1.25rem', fontWeight: '900', letterSpacing: '0.4em', textAlign: 'center', outline: 'none', boxSizing: 'border-box', transition: 'border-color 0.2s' }}
                                             onFocus={e => e.target.style.borderColor = '#ef4444'}
                                             onBlur={e => e.target.style.borderColor = '#e2e8f0'}
                                         />
@@ -560,23 +560,57 @@ const MyOrders = () => {
                                 </div>
 
                                 {setupPinError && (
-                                    <p style={{ color: '#ef4444', fontSize: '0.82rem', fontWeight: '700', textAlign: 'center', background: '#fef2f2', padding: '0.5rem 0.75rem', borderRadius: '8px', border: '1px solid #fecaca' }}>{setupPinError}</p>
+                                    <div style={{ background: '#fef2f2', padding: '0.6rem 0.85rem', borderRadius: '10px', border: '1px solid #fecaca', textAlign: 'center' }}>
+                                        <p style={{ color: '#ef4444', fontSize: '0.8rem', fontWeight: '700', margin: 0, lineHeight: '1.5' }}>
+                                            {setupPinError.toLowerCase().includes('already registered') || setupPinError.toLowerCase().includes('existing pin') ? (
+                                                <span>
+                                                    This phone number is already registered with an existing PIN. Please{' '}
+                                                    <button
+                                                        type="button"
+                                                        onClick={() => {
+                                                            setShowSetupPinModal(false);
+                                                            setIsRegistering(false);
+                                                            setPhone(setupPinPhone);
+                                                            setError('');
+                                                        }}
+                                                        style={{
+                                                            background: 'none',
+                                                            border: 'none',
+                                                            padding: 0,
+                                                            color: '#2563eb',
+                                                            fontSize: 'inherit',
+                                                            fontWeight: '800',
+                                                            textDecoration: 'underline',
+                                                            cursor: 'pointer',
+                                                            fontFamily: 'inherit',
+                                                            display: 'inline'
+                                                        }}
+                                                    >
+                                                        login
+                                                    </button>{' '}
+                                                    with your PIN instead.
+                                                </span>
+                                            ) : (
+                                                setupPinError
+                                            )}
+                                        </p>
+                                    </div>
                                 )}
 
                                 <button
                                     type="submit"
                                     disabled={setupPinLoading}
                                     className="btn btn-primary"
-                                    style={{ padding: '1rem', borderRadius: '12px', fontWeight: '800', fontSize: '0.95rem', marginTop: '0.25rem', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.5rem' }}
+                                    style={{ padding: '0.8rem', borderRadius: '10px', fontWeight: '800', fontSize: '0.9rem', marginTop: '0.15rem', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.5rem' }}
                                 >
-                                    {setupPinLoading ? <Loader2 size={18} className="animate-spin" /> : <><CheckCircle2 size={18} /> Create My Account</>}
+                                    {setupPinLoading ? <Loader2 size={16} className="animate-spin" /> : <><CheckCircle2 size={16} /> Create My Account</>}
                                 </button>
                             </form>
 
-                            <div style={{ marginTop: '1.25rem', textAlign: 'center' }}>
+                            <div style={{ marginTop: '0.75rem', textAlign: 'center' }}>
                                 <button
-                                    onClick={() => { setShowSetupPinModal(false); }}
-                                    style={{ background: 'none', border: 'none', color: '#94a3b8', fontSize: '0.82rem', fontWeight: '700', cursor: 'pointer' }}
+                                    onClick={() => { setShowSetupPinModal(false); navigate('/'); }}
+                                    style={{ background: 'none', border: 'none', color: '#2563eb', fontSize: '0.82rem', fontWeight: '700', textDecoration: 'underline', cursor: 'pointer' }}
                                 >
                                     Skip for now — I'll login later
                                 </button>
@@ -602,30 +636,69 @@ const MyOrders = () => {
                             <PinEyeToggle visible={showLoginPin} onToggle={() => setShowLoginPin(v => !v)} />
                         </div>
                         
-                        {error && <p style={{ color: 'var(--primary-red)', fontSize: '0.8rem', fontWeight: '700', textAlign: 'center' }}>{error}</p>}
+                        {error && (
+                            <div style={{ background: '#fef2f2', padding: '0.65rem 0.85rem', borderRadius: '10px', border: '1px solid #fecaca', textAlign: 'center' }}>
+                                <p style={{ color: 'var(--primary-red)', fontSize: '0.8rem', fontWeight: '700', margin: 0, lineHeight: '1.4' }}>
+                                    {error.toLowerCase().includes('already registered') ? (
+                                        <span>
+                                            This phone number is already registered. Please{' '}
+                                            <button
+                                                type="button"
+                                                onClick={() => {
+                                                    setIsRegistering(false);
+                                                    setPhone(regPhone || phone);
+                                                    setError('');
+                                                }}
+                                                style={{
+                                                    background: 'none',
+                                                    border: 'none',
+                                                    padding: 0,
+                                                    color: '#2563eb',
+                                                    fontSize: 'inherit',
+                                                    fontWeight: '800',
+                                                    textDecoration: 'underline',
+                                                    cursor: 'pointer',
+                                                    fontFamily: 'inherit',
+                                                    display: 'inline'
+                                                }}
+                                            >
+                                                login
+                                            </button>{' '}
+                                            with your PIN instead.
+                                        </span>
+                                    ) : (
+                                        error
+                                    )}
+                                </p>
+                            </div>
+                        )}
                         
                         <button type="submit" disabled={authLoading} className="btn btn-primary" style={{ padding: '1rem', borderRadius: '12px', fontWeight: '800', marginTop: '0.5rem' }}>
                             {authLoading ? <Loader2 className="animate-spin" /> : (isRegistering ? 'Register' : 'Login')}
                         </button>
                         
-                        <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem', marginTop: '0.5rem' }}>
+                        <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem', marginTop: '0.75rem', textAlign: 'center' }}>
                             <button 
                                 type="button" 
-                                onClick={() => setIsRegistering(!isRegistering)} 
-                                style={{ background: 'none', border: 'none', color: 'var(--text-gray)', fontSize: '0.85rem', fontWeight: '700', cursor: 'pointer' }}
+                                onClick={() => { setIsRegistering(!isRegistering); setError(''); }} 
+                                style={{ background: 'none', border: 'none', color: '#475569', fontSize: '0.875rem', fontWeight: '600', cursor: 'pointer', padding: '0.25rem' }}
                             >
-                                {isRegistering ? 'Already have an account? Login' : 'New here? Create Account'}
+                                {isRegistering ? (
+                                    <>Already have an account? <span style={{ color: '#2563eb', fontWeight: '800', textDecoration: 'underline' }}>Login</span></>
+                                ) : (
+                                    <>New here? <span style={{ color: '#2563eb', fontWeight: '800', textDecoration: 'underline' }}>Create Account</span></>
+                                )}
                             </button>
 
                             {!isRegistering && (
-                                <div style={{ textAlign: 'center', marginTop: '0.75rem' }}>
+                                <div style={{ textAlign: 'center', marginTop: '0.25rem' }}>
                                     <a 
                                         href={`https://wa.me/${(settings.support_phone || settings.store_phone || '9779845877777').replace(/\D/g, '')}?text=${encodeURIComponent(`Hi Shopy Nepal, I forgot my account PIN. My phone number is: ${phone || '(Not provided)'}. Please help me reset it!`)}`}
                                         target="_blank"
                                         rel="noreferrer"
                                         style={{ 
-                                            color: 'var(--primary-red)', 
-                                            fontSize: '0.8rem', 
+                                            color: '#2563eb', 
+                                            fontSize: '0.85rem', 
                                             fontWeight: '800', 
                                             textDecoration: 'underline',
                                             cursor: 'pointer'

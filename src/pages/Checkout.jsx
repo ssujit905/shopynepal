@@ -555,56 +555,56 @@ const Checkout = () => {
             )}
             <div className="container">
                 {isOrdered ? (
-                    /* ─── SUCCESS SCREEN ─── */
-                    <div style={{ maxWidth: '600px', margin: '3rem auto', padding: '2.5rem', background: 'white', borderRadius: '2rem', border: '1px solid #e2e8f0', boxShadow: '0 20px 40px rgba(0,0,0,0.04)' }}>
-                        <div style={{ textAlign: 'center', marginBottom: '2rem' }}>
-                            <div style={{ width: '70px', height: '70px', background: '#ecfdf5', color: '#10b981', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 1rem' }}>
-                                <CheckCircle size={44} />
+                    /* ─── SUCCESS SCREEN (COMPACT SINGLE-SCREEN VIEW) ─── */
+                    <div style={{ maxWidth: '460px', margin: '0.75rem auto 1.5rem', padding: '1.25rem 1.4rem', background: 'white', borderRadius: '1.25rem', border: '1px solid #e2e8f0', boxShadow: '0 10px 30px rgba(0,0,0,0.04)', boxSizing: 'border-box' }}>
+                        <div style={{ textAlign: 'center', marginBottom: '0.75rem' }}>
+                            <div style={{ width: '42px', height: '42px', background: '#ecfdf5', color: '#10b981', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 0.4rem' }}>
+                                <CheckCircle size={24} />
                             </div>
-                            <h1 style={{ fontWeight: '900', color: '#111827', fontSize: '1.8rem', margin: '0 0 0.5rem 0' }}>Order Confirmed!</h1>
-                            <p style={{ color: '#10b981', fontWeight: '700', fontSize: '0.95rem' }}>
+                            <h1 style={{ fontWeight: '900', color: '#111827', fontSize: '1.25rem', margin: '0 0 0.15rem 0' }}>Order Confirmed!</h1>
+                            <p style={{ color: '#10b981', fontWeight: '700', fontSize: '0.82rem', margin: 0 }}>
                                 Thank you, {(formData.fullName || 'Customer').split(' ')[0]}! Your order has been placed.
                             </p>
                         </div>
 
                         {formData.paymentMethod === 'Bank Transfer' && (
-                            <div style={{ background: '#eff6ff', border: '1px solid #bfdbfe', borderRadius: '1rem', padding: '1rem', marginBottom: '1.5rem', textAlign: 'left' }}>
-                                <p style={{ fontWeight: '800', color: '#1d4ed8', marginBottom: '0.25rem', fontSize: '0.9rem' }}>🏦 Bank Transfer Pending Verification</p>
-                                <p style={{ fontSize: '0.8rem', color: '#1e40af' }}>Your order is placed. We will verify your transfer (Ref: <strong>{txnRef}</strong>) and confirm within 24 hours.</p>
+                            <div style={{ background: '#eff6ff', border: '1px solid #bfdbfe', borderRadius: '0.75rem', padding: '0.5rem 0.75rem', marginBottom: '0.65rem', textAlign: 'left' }}>
+                                <p style={{ fontWeight: '800', color: '#1d4ed8', margin: '0 0 0.15rem 0', fontSize: '0.8rem' }}>🏦 Bank Transfer Verification</p>
+                                <p style={{ fontSize: '0.75rem', color: '#1e40af', margin: 0 }}>Order placed. We will verify Ref: <strong>{txnRef}</strong> within 24 hours.</p>
                             </div>
                         )}
 
-                        <div style={{ background: '#f8fafc', padding: '1.5rem', borderRadius: '1.25rem', border: '1px solid #f1f5f9', marginBottom: '2rem', textAlign: 'left' }}>
-                            <h3 style={{ margin: '0 0 1rem 0', fontWeight: '800', fontSize: '1rem', color: '#1e293b', borderBottom: '1px solid #e2e8f0', paddingBottom: '0.5rem' }}>Order Details</h3>
-                            <div style={{ display: 'flex', flexDirection: 'column', gap: '0.8rem', fontSize: '0.875rem' }}>
+                        <div style={{ background: '#f8fafc', padding: '0.75rem 1rem', borderRadius: '0.85rem', border: '1px solid #f1f5f9', marginBottom: '0.85rem', textAlign: 'left' }}>
+                            <h3 style={{ margin: '0 0 0.5rem 0', fontWeight: '800', fontSize: '0.82rem', color: '#1e293b', borderBottom: '1px solid #e2e8f0', paddingBottom: '0.35rem', textTransform: 'uppercase', letterSpacing: '0.04em' }}>Order Details</h3>
+                            <div style={{ display: 'flex', flexDirection: 'column', gap: '0.35rem', fontSize: '0.8rem' }}>
                                 <div style={{ display: 'flex', justifyContent: 'space-between' }}>
                                     <span style={{ color: '#64748b' }}>Order Number</span>
                                     <strong style={{ color: '#0f172a' }}>{orderNumber}</strong>
                                 </div>
                                 <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-                                    <span style={{ color: '#64748b' }}>Payment Method</span>
+                                    <span style={{ color: '#64748b' }}>Payment</span>
                                     <strong style={{ color: '#0f172a' }}>{formData.paymentMethod || 'Cash on Delivery'}</strong>
                                 </div>
                                 <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-                                    <span style={{ color: '#64748b' }}>Total Amount</span>
-                                    <strong style={{ color: '#059669', fontSize: '1rem' }}>Rs. {(placedTotal ?? grandTotal).toLocaleString()}</strong>
+                                    <span style={{ color: '#64748b' }}>Total</span>
+                                    <strong style={{ color: '#059669', fontSize: '0.92rem' }}>Rs. {(placedTotal ?? grandTotal).toLocaleString()}</strong>
                                 </div>
-                                <div style={{ display: 'flex', justifyContent: 'space-between', borderTop: '1px solid #e2e8f0', paddingTop: '0.8rem' }}>
-                                    <span style={{ color: '#64748b' }}>Customer Name</span>
+                                <div style={{ display: 'flex', justifyContent: 'space-between', borderTop: '1px solid #e2e8f0', paddingTop: '0.35rem' }}>
+                                    <span style={{ color: '#64748b' }}>Customer</span>
                                     <span style={{ color: '#0f172a', fontWeight: '600' }}>{formData.fullName}</span>
                                 </div>
                                 <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-                                    <span style={{ color: '#64748b' }}>Contact Phone</span>
+                                    <span style={{ color: '#64748b' }}>Phone</span>
                                     <span style={{ color: '#0f172a', fontWeight: '600' }}>{formData.phone}</span>
                                 </div>
                                 <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-                                    <span style={{ color: '#64748b' }}>Delivery Address</span>
+                                    <span style={{ color: '#64748b' }}>Address</span>
                                     <span style={{ color: '#0f172a', fontWeight: '600', textAlign: 'right' }}>{formData.address}, {formData.city}</span>
                                 </div>
                             </div>
                         </div>
 
-                        <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
+                        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(170px, 1fr))', gap: '0.5rem' }}>
                             <button
                                 onClick={() => {
                                     if (customer) {
@@ -615,15 +615,15 @@ const Checkout = () => {
                                     }
                                 }}
                                 className="btn btn-primary"
-                                style={{ width: '100%', padding: '1rem', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.5rem', fontWeight: '700' }}
+                                style={{ width: '100%', padding: '0.65rem 0.85rem', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.4rem', fontWeight: '700', fontSize: '0.85rem' }}
                             >
-                                <ShoppingBag size={18} /> View My Orders <ArrowRight size={16} />
+                                <ShoppingBag size={15} /> View My Orders <ArrowRight size={14} />
                             </button>
 
                             <button
                                 onClick={() => navigate('/shop')}
                                 className="btn btn-secondary"
-                                style={{ width: '100%', padding: '1rem', fontWeight: '700' }}
+                                style={{ width: '100%', padding: '0.65rem 0.85rem', fontWeight: '700', fontSize: '0.85rem' }}
                             >
                                 Continue Shopping
                             </button>
