@@ -583,7 +583,11 @@ const MyOrders = () => {
                                                             textDecoration: 'underline',
                                                             cursor: 'pointer',
                                                             fontFamily: 'inherit',
-                                                            display: 'inline'
+                                                            display: 'inline',
+                                                            minHeight: 0,
+                                                            height: 'auto',
+                                                            lineHeight: 'inherit',
+                                                            verticalAlign: 'baseline'
                                                         }}
                                                     >
                                                         login
@@ -659,7 +663,11 @@ const MyOrders = () => {
                                                     textDecoration: 'underline',
                                                     cursor: 'pointer',
                                                     fontFamily: 'inherit',
-                                                    display: 'inline'
+                                                    display: 'inline',
+                                                    minHeight: 0,
+                                                    height: 'auto',
+                                                    lineHeight: 'inherit',
+                                                    verticalAlign: 'baseline'
                                                 }}
                                             >
                                                 login
