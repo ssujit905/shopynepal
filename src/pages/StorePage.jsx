@@ -93,8 +93,8 @@ const StorePage = () => {
             if (productIds.length > 0) {
                 const { data: storeRatings } = await safeFetch(() =>
                     supabase
-                        .from('website_product_ratings')
-                        .select('id, product_id, rating, comment, customer_name, created_at')
+                        .from('website_product_ratings_public')
+                        .select('id, product_id, rating, comment, created_at')
                         .in('product_id', productIds)
                         .order('created_at', { ascending: false })
                 );

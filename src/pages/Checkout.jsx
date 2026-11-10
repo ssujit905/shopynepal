@@ -326,7 +326,10 @@ const Checkout = () => {
                     p_payment_method: 'eSewa',
                     p_items: checkoutItems.map(item => ({ variant_id: item.variant_id, quantity: item.quantity })),
                     p_coins_used: appliedCoinDiscount,
-                    p_ad_id: checkoutItems[0]?.ad_id || null
+                    p_ad_id: checkoutItems[0]?.ad_id || null,
+                    // Loyalty coins may only be spent by a signed-in customer,
+                    // for their own phone number. Guests simply get 0 coins.
+                    p_customer_token: sessionStorage.getItem('shopy_customer_session') || null
                 }));
                 if (intentError || !intent?.intent_token) {
                     if (/PRODUCT_SOLD_OUT|PRODUCT_UNAVAILABLE|PAYMENT_METHOD_NOT_ALLOWED|INVALID_VARIANT|INVALID_QUANTITY/.test(intentError?.message || '')) {
@@ -382,7 +385,10 @@ const Checkout = () => {
                     p_payment_method: 'Bank Transfer',
                     p_items: checkoutItems.map(item => ({ variant_id: item.variant_id, quantity: item.quantity })),
                     p_coins_used: appliedCoinDiscount,
-                    p_ad_id: checkoutItems[0]?.ad_id || null
+                    p_ad_id: checkoutItems[0]?.ad_id || null,
+                    // Loyalty coins may only be spent by a signed-in customer,
+                    // for their own phone number. Guests simply get 0 coins.
+                    p_customer_token: sessionStorage.getItem('shopy_customer_session') || null
                 }));
                 if (intentError || !intent?.intent_token) {
                     if (/PRODUCT_SOLD_OUT|PRODUCT_UNAVAILABLE|PAYMENT_METHOD_NOT_ALLOWED|INVALID_VARIANT|INVALID_QUANTITY/.test(intentError?.message || '')) {
@@ -441,7 +447,9 @@ const Checkout = () => {
                 p_total_amount: grandTotal,
                 p_items: orderItems,
                 p_coins_used: appliedCoinDiscount,
-                p_ad_id: checkoutItems[0]?.ad_id || null
+                p_ad_id: checkoutItems[0]?.ad_id || null,
+                // Proves the customer may spend their own loyalty coins.
+                p_customer_token: sessionStorage.getItem('shopy_customer_session') || null
             }));
 
             setCheckoutError(null);
@@ -477,9 +485,10 @@ const Checkout = () => {
                     cartTotal: Number(result.total_amount || checkoutSubtotal),
                     stepName: 'completed',
                     metadata: {
-                        orderNumber: result.order_number,
+                        // No order number, phone or city here: this row is
+                        // inserted with the ANON key, and the table can be read
+                        // back by anyone. Order numbers are PII-adjacent.
                         paymentMethod: formData.paymentMethod,
-                        city: formData.city
                     }
                 });
 
@@ -611,7 +620,10 @@ const Checkout = () => {
                                         navigate('/my-orders');
                                     } else {
                                         const phone = formData.phone || '';
-                                        navigate(`/my-orders?setup-pin=${encodeURIComponent(phone)}`);
+                                        // Keep the phone out of the URL: it would end up in
+                                        // browser history, Referer headers and server logs.
+                                        sessionStorage.setItem('pending_setup_pin_phone', String(phone));
+                                        navigate('/my-orders?setup-pin=1');
                                     }
                                 }}
                                 className="btn btn-primary"

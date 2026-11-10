@@ -46,7 +46,10 @@ const MyOrders = () => {
     const location = useLocation();
     const navigate = useNavigate();
     
-    const querySetupPin = new URLSearchParams(location.search).get('setup-pin');
+    // The phone comes from sessionStorage (set by checkout), not from the URL.
+    const querySetupPin = new URLSearchParams(location.search).get('setup-pin')
+        ? sessionStorage.getItem('pending_setup_pin_phone')
+        : null;
     const [activeStatus, setActiveStatus] = useState('Processing');
     const [isRegistering, setIsRegistering] = useState(false);
     const [orders, setOrders] = useState([]);
@@ -246,12 +249,14 @@ const MyOrders = () => {
             // Ratings (Selecting order IDs for "Rated" badges can stay public for now if we allow public select on that table)
             const { data: ratingsData } = await safeFetch(() =>
                 supabase
-                    .from('website_product_ratings')
-                    .select('order_id')
-                    .eq('customer_phone', customer.phone)
+                    .rpc('customer_ratings', {
+                        p_token: sessionStorage.getItem('shopy_customer_session') || ''
+                    })
             );
             
-            if (ratingsData) setRatedOrderIds(new Set(ratingsData.map(r => r.order_id).filter(Boolean)));
+            if (ratingsData?.rated_order_ids) {
+                setRatedOrderIds(new Set(ratingsData.rated_order_ids.filter(Boolean)));
+            }
         } catch (err) {
             console.error('Fetch dashboard error:', err);
         } finally {

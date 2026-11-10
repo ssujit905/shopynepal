@@ -261,7 +261,10 @@ const PaymentSuccess = () => {
                             navigate('/my-orders');
                         } else {
                             const phone = orderInfo?.phone || '';
-                            navigate(`/my-orders?setup-pin=${encodeURIComponent(phone)}`);
+                            // Keep the phone out of the URL: it would end up in
+                            // browser history, Referer headers and server logs.
+                            sessionStorage.setItem('pending_setup_pin_phone', String(phone));
+                            navigate('/my-orders?setup-pin=1');
                         }
                     }}
                     className="btn btn-primary" 

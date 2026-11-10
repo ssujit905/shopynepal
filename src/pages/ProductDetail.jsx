@@ -257,8 +257,8 @@ const ProductDetail = () => {
         try {
             const { data, error } = await safeFetch(() =>
                 supabase
-                    .from('website_product_ratings')
-                    .select('*')
+                    .from('website_product_ratings_public')
+                    .select('id, product_id, rating, comment, created_at')
                     .eq('product_id', id)
                     .order('created_at', { ascending: false })
             );

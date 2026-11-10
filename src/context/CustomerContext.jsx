@@ -149,11 +149,19 @@ export const CustomerProvider = ({ children }) => {
                 p_pin: String(pin).trim(),
                 p_name: name || null,
                 p_address: address || null,
-                p_city: city || null
+                p_city: city || null,
+                // A live session for this very phone proves ownership and lets
+                // the customer set their PIN again. The server refuses to reset
+                // somebody else's PIN (ACCOUNT_EXISTS).
+                p_customer_token: sessionStorage.getItem('shopy_customer_session') || null
             }));
 
             if (error || !data?.success) {
-                throw new Error(friendlyAuthError(data?.error || error?.message, 'Failed to set up account'));
+                const message = data?.error || error?.message || 'Failed to set up account';
+                if (/ACCOUNT_EXISTS/i.test(message)) {
+                    throw new Error('An account already exists for this phone number. Please log in with your PIN, or contact us to reset it.');
+                }
+                throw new Error(friendlyAuthError(message, 'Failed to set up account'));
             }
 
             setCustomer(data.customer);
