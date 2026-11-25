@@ -21,7 +21,7 @@ export const SettingsProvider = ({ children }) => {
         setSettingsError(null);
         try {
             const { data, error } = await safeFetch(() =>
-                supabase.from('website_settings').select('*')
+                supabase.from('website_settings').select('key, value')
             );
             if (error) {
                 console.error('Failed to load website settings:', error);

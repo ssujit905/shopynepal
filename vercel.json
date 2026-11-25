@@ -28,6 +28,10 @@
         {
           "key": "Strict-Transport-Security",
           "value": "max-age=63072000; includeSubDomains; preload"
+        },
+        {
+          "key": "Content-Security-Policy",
+          "value": "default-src 'self' https://*.supabase.co wss://*.supabase.co; script-src 'self'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; img-src 'self' data: blob: https://*.supabase.co https://images.unsplash.com https://*.esewa.com.np; font-src 'self' data: https://fonts.gstatic.com; connect-src 'self' https://*.supabase.co wss://*.supabase.co; worker-src 'self' blob:; form-action 'self' https://*.esewa.com.np https://*.fonepay.com https://dev-clientapi.fonepay.com https://clientapi.fonepay.com; object-src 'none'; base-uri 'none'; frame-ancestors 'none'; upgrade-insecure-requests"
         }
       ]
     },

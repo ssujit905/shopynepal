@@ -392,7 +392,11 @@ const MyOrders = () => {
                 // Fail fast on stalled uploads; the user retries explicitly
                 // (no auto-retry — a blind retry could double-upload).
                 const { error: uploadError } = await supabaseWithTimeout(
-                    supabase.storage.from('images').upload(path, f.file, { contentType: 'image/jpeg' }),
+                    supabase.storage.from('images').upload(path, f.file, {
+                        contentType: 'image/jpeg',
+                        // Storage RLS proves the uploader owns this order.
+                        headers: { 'x-customer-token': sessionStorage.getItem('shopy_customer_session') || '' }
+                    }),
                     24000
                 );
                 if (uploadError) throw uploadError;

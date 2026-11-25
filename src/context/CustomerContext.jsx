@@ -103,6 +103,12 @@ export const CustomerProvider = ({ children }) => {
     };
 
     const logout = useCallback(() => {
+        const token = sessionStorage.getItem('shopy_customer_session');
+        if (token) {
+            // Revoke server-side so a captured token cannot outlive the UI
+            // session (best effort; never blocks logout).
+            Promise.resolve(supabase.rpc('customer_logout', { p_token: token })).catch(() => {});
+        }
         setCustomer(null);
         try {
             sessionStorage.removeItem('shopy_customer');
