@@ -170,21 +170,18 @@ const Checkout = () => {
             }
             setBranches(loadedBranches);
 
-            // 2. Fetch last order to autofill if logged in
+            // 2. Autofill from the customer's last order. website_orders is
+            //    RLS-protected, so this must go through a session-validated RPC.
             let lastOrderDetails = null;
             if (customer) {
-                const { data: lastOrder } = await safeFetch(() =>
-                    supabase
-                        .from('website_orders')
-                        .select('*')
-                        .eq('phone', customer.phone)
-                        .order('created_at', { ascending: false })
-                        .limit(1)
-                        .maybeSingle()
-                );
-                
-                if (lastOrder) {
-                    lastOrderDetails = lastOrder;
+                const token = sessionStorage.getItem('shopy_customer_session');
+                if (token) {
+                    const { data: lastOrderData } = await safeFetch(() =>
+                        supabase.rpc('customer_last_order_shipping', { p_token: token })
+                    );
+                    if (lastOrderData?.success && lastOrderData.order) {
+                        lastOrderDetails = lastOrderData.order;
+                    }
                 }
             }
 

@@ -59,13 +59,19 @@ const Shop = () => {
         }
     }, [loading, searchQuery, filteredProducts.length]);
 
-    // Pagination (Term 14): chunked rendering eliminates Jank & GC pressure
+    // Pagination (Term 14): chunked rendering eliminates Jank & GC pressure.
+    // The active filter key is stored with the count, so changing filters
+    // resets the page during render — no reset effect (cascading render) needed.
     const ITEMS_PER_PAGE = 24;
-    const [visibleCount, setVisibleCount] = useState(ITEMS_PER_PAGE);
-
-    useEffect(() => {
-        setVisibleCount(ITEMS_PER_PAGE);
-    }, [searchQuery, selectedCategory, sortBy]);
+    const filterKey = `${searchQuery}|${selectedCategory}|${sortBy}`;
+    const [pagination, setPagination] = useState({ key: filterKey, count: ITEMS_PER_PAGE });
+    const visibleCount = pagination.key === filterKey ? pagination.count : ITEMS_PER_PAGE;
+    const setVisibleCount = (updater) => {
+        setPagination(prev => {
+            const base = prev.key === filterKey ? prev.count : ITEMS_PER_PAGE;
+            return { key: filterKey, count: typeof updater === 'function' ? updater(base) : updater };
+        });
+    };
 
     const displayedProducts = useMemo(() => {
         return filteredProducts.slice(0, visibleCount);
